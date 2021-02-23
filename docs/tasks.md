@@ -1,0 +1,66 @@
+#### ***Task***: Fazer um sistema de autenticação usando Django e React
+
+##### Model View Controller pattern (padrão de projeto)
+- A camada **Model** é o coração da aplicação, onde se localizam as regras de negócio, as entidades, a camada de acesso a dados, validação
+- A camada **View** é responsável por renderizar a resposta à requisição (JavaScript, CSS, HTML, Template Engine)
+- No meio das duas camadas anteriores, temos o **Controller**, coordenando o fluxo da aplicação
+
+![Diagram From Wikipedia, the free encyclopedia](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/MVC-Process.svg/200px-MVC-Process.svg.png)
+
+- **Analogia Aplicação MVC x Prédio comercial**
+    - o recepcionista do prédio é o framework MVC/front-controller. Ele recebe as requisições, pode consultar algum arquivo de metadados (xml, json) que possua por exemplo o mapeamento das rotas (qual url aponta para qual método). Ele encaminha para o "setor responsável" a requisição feita pelo usuário.
+    - a pessoa que recebe a requisição das mãos do recepcionista, leva ao setor responsável e traz a resposta é o controller. O controller sabe quais informações são necessárias para gerar a view, requisita ao model tais informações e transmite a resposta para quem solicitou.
+- O **browser** gera uma requisição a partir de uma URL e envia a --> um **web server** (e.g. Apache), que usando essa URL, direciona ao alvo da requisição, --> uma **aplicação**, na sua camada **controller**.
+- Se não houver necessidade de se acessar dados (por exemplo, um GET para renderizar a página inicial du uma simples aplicação que não exija validação de nenhuma regra), o **controller** encaminha a requisição ao **view**, que renderiza a resposta enviada ao browser.
+- Caso haja a necessidade de se acessar dados para gerar a resposta, o **controller** direciona a requisição ao **model**, que acessa o banco de dados e devolve as informações ao **controller**. Essa operação se repetirá até que o **controller** tenha obtido as informações necessárias para atender a requisição e encaminhá-las para o **view**, que finalmente renderizará a resposta ao browser.
+
+##### Qual o papel do Django e do React no MVC
+- O React atua sobre a camada **view** da aplicação, recebendo as informações do **controller** para renderizar as respostas ao usuário
+- O Django, por sua vez, se ocupará das camadas
+    - **controller**: mapeamento de rotas, entrypoint e endpoints, julgando se há necessidade de acessar dados, podendo direcionar a requisição tanto para o model (quando há essa necessidade) quanto para a view (quando não há).
+    - **model**: regras de neǵocio, validações, camada de acesso ao banco de dados. É instanciado pelo controller e responde a essa mesma camada para o fluxo da aplicação.
+
+##### Qual os passos para a aplicação prática?
+- *iniciar uma aplicação do Django*
+    - create repository on github (branch `main`)
+    - `git clone projectFolder` (when you clone you don't need to add a remote like `git remote add origin <url>`)
+    - `django-admin startproject projectName projectFolder`
+    - ??? should I add `settings.py` to .gitignore ???
+    - `git push -u origin main`
+    - ??? save `SECRET_KEY` and database password as environment variables -> is this effective? what else can be done? ???
+- *utilizar o sistema de usuários builtin*
+    - ***dont use django.contrib.auth for now, only django.models***
+        - auth support for Django is in the module `django.contrib.auth`
+        - `django-admin startproject` by default creates `settings.py` with two items in `INSTALLED_APPS`:
+            1 `django.contrib.auth`: : core of the authentication framework, and its default models.
+            2 `django.contrib.contenttypes`: Django content type system, which allows permissions to be associated with models you create.
+        - `django-admin startproject` also by default lists these two items in `MIDDLEWARE`:
+            1 `SessionMiddleware` manages sessions across requests.
+            2 `AuthenticationMiddleware` associates users with requests using sessions.
+
+- *endpoint para criar novos usuários*
+    - `django-admin startapp accounts`
+    - Each Django model is a Python class that subclasses django.db.models.Model. Set User model on accounts.models.py
+    - The most important part of a model – and the only required part of a model – is the list of database fields it defines
+    - Once you have defined your models, you need to tell Django you’re going to use those models. Do this by editing your settings file and changing the INSTALLED_APPS setting to add the name of the module that contains your models.py
+    - With these settings in place, running the command `manage.py migrate` creates the necessary database tables for auth related models and permissions for any models defined in your installed apps
+    - add url pattern to admin urls targeting accounts urls
+    - add a urls.py to accounts app and target route '\signup\' to signup view
+    - add view for responding to `request` -> `from django.http import JsonResponse`
+    - assign route to view (`import .view` on urls.py; `path('path\', <callable from .view>)`)
+
+    - *receber um request com usuário, senha e email*
+    - *responder um status de created*
+- endpoint de logar
+    - receber um usuário e senha
+    - retorna um token e um status de ok
+- front-end
+    - setup do React
+    - tela de criar novo usuário
+        - formulário -> user senha e email
+        - enviar form para o endpoint
+    - tela de login
+        - form com user e senha
+        - enviar o form para o endpoint
+        - dependendo da resposta mandar para outra tela de logado
+    - tela de logado que só pode ser acessada se tiver token válido
