@@ -10,8 +10,14 @@ def check_endpoint_status(request):
     response.status_code = 200
     return response
 
+
 def signup(request):
-    request.method == 'POST'
-    data = request.body.decode()
-    response = JsonResponse({'data': data})
-    return response
+    if request.method == 'POST':
+        data = json.loads(request.body.decode())
+        user = User.objects.create(username=data['username'], email=data['email'], password=data['password'])
+        print(user)
+        return JsonResponse({'user_created': 'ok'})
+    else:
+        response = JsonResponse({'error': 'unauthorized'})
+        response.status_code = 401
+        return response

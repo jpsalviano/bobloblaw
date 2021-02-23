@@ -42,12 +42,15 @@
     - `django-admin startapp accounts`
     - Each Django model is a Python class that subclasses django.db.models.Model. Set User model on accounts.models.py
     - The most important part of a model – and the only required part of a model – is the list of database fields it defines
+    - USE MODEL AS AUTH_USER_MODEL! and then migrate again.
     - Once you have defined your models, you need to tell Django you’re going to use those models. Do this by editing your settings file and changing the INSTALLED_APPS setting to add the name of the module that contains your models.py
     - With these settings in place, running the command `manage.py migrate` creates the necessary database tables for auth related models and permissions for any models defined in your installed apps
     - add url pattern to admin urls targeting accounts urls
     - add a urls.py to accounts app and target route '\signup\' to signup view
     - add view for responding to `request` -> `from django.http import JsonResponse`
     - assign route to view (`import .view` on urls.py; `path('path\', <callable from .view>)`)
+    - create a function on views.py that takes the `request.body.decode()` and load it to json (`json.loads()`)
+    - it will read a json object and use the info to create a User object
 
     - *receber um request com usuário, senha e email*
     - *responder um status de created*
