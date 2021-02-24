@@ -42,7 +42,8 @@
     - `django-admin startapp accounts`
     - Each Django model is a Python class that subclasses django.db.models.Model. Set User model on accounts.models.py
     - The most important part of a model – and the only required part of a model – is the list of database fields it defines
-    - USE MODEL AS AUTH_USER_MODEL! and then migrate again.
+    - Don’t forget to point AUTH_USER_MODEL to it. Do this before creating any migrations or running manage.py migrate for the first time.
+    - Also, register the model in the app’s admin.py
     - Once you have defined your models, you need to tell Django you’re going to use those models. Do this by editing your settings file and changing the INSTALLED_APPS setting to add the name of the module that contains your models.py
     - With these settings in place, running the command `manage.py migrate` creates the necessary database tables for auth related models and permissions for any models defined in your installed apps
     - add url pattern to admin urls targeting accounts urls
