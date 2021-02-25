@@ -16,7 +16,9 @@ def signup(request):
         data = json.loads(request.body.decode())
         user = User.create_user(username=data['username'], email=data['email'], password=data['password'])
         user.save()
-        return JsonResponse({'user_created': 'ok'})
+        response = JsonResponse({'user_created': 'ok'})
+        response.status_code = 201
+        return response
     else:
         response = JsonResponse({'error': 'unauthorized'})
         response.status_code = 401
