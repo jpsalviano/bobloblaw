@@ -39,10 +39,12 @@
             2 `AuthenticationMiddleware` associates users with requests using sessions.
 
 - *endpoint para criar novos usuários*
+- *receber um request com usuário, senha e email*
+- *responder um status de created*
     - `django-admin startapp accounts`
-    - Each Django model is a Python class that subclasses django.db.models.Model. Set User model on accounts.models.py
+    - Each Django model is a Python class that subclasses `django.db.models.Model`
+    - Set user model on accounts models.py
     - The most important part of a model – and the only required part of a model – is the list of database fields it defines
-    - Don’t forget to point AUTH_USER_MODEL to it. Do this before creating any migrations or running manage.py migrate for the first time.
     - Also, register the model in the app’s admin.py
     - Once you have defined your models, you need to tell Django you’re going to use those models. Do this by editing your settings file and changing the INSTALLED_APPS setting to add the name of the module that contains your models.py
     - With these settings in place, running the command `manage.py migrate` creates the necessary database tables for auth related models and permissions for any models defined in your installed apps
@@ -51,13 +53,12 @@
     - `import .view`, and then `path('signup/', <callable from .view>)`
     - add view for responding to `request` -> `from django.http import JsonResponse`
     - create a function on the view that takes the `request.body.decode()` and load it to json (`json.loads()`)
-    - it will read a json object and use the info to create a User object
+    - it will read a string a cast it to a json object so you can use the info to create a User object
+    - The keyword arguments are the names of the fields you’ve defined on your model. Note that instantiating a model in no way touches your database; for that, you need to `save()`
 
-    - *receber um request com usuário, senha e email*
-    - *responder um status de created*
-- endpoint de logar
-    - receber um usuário e senha
-    - retorna um token e um status de ok
+- *endpoint de logar*
+    - *receber um usuário e senha*
+    - *retorna um token e um status de ok*
 - front-end
     - setup do React
     - tela de criar novo usuário
