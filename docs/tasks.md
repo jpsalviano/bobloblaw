@@ -55,6 +55,7 @@
     - create a function on the view that takes the `request.body.decode()` and load it to json (`json.loads()`)
     - it will read a string a cast it to a json object so you can use the info to create a User object
     - The keyword arguments are the names of the fields you’ve defined on your model. Note that instantiating a model in no way touches your database; for that, you need to `save()`
+    - The HTTP `201 Created` success status response code indicates that the request has succeeded and has led to the creation of a resource.
 
 - *endpoint de logar*
     - *receber um usuário e senha*
