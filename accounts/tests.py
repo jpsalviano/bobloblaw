@@ -16,9 +16,25 @@ class UserModelTestCase(TestCase):
         email = models.EmailField()
         password = models.CharField(max_length=100)
 
-    def test_create_user_class_method(cls):
+        @classmethod
+        def create_user(cls, username, email, password):
+            user = cls(username=username, email=email, password=password)
+            return user
+
+
+    def test_user_model_class(cls):
         doc = cls.TestUser(username="cardoso", email="cardoso@anon.com", password="abc123-")
-        self.assertNotEqual(User)
+        result = User(username="cardoso", email="cardoso@anon.com", password="abc123-")
+        cls.assertEqual(result.username, doc.username)
+        cls.assertEqual(result.email, doc.email)
+        cls.assertEqual(result.password, doc.password)
+
+    def test_user_model_create_user_method(cls):
+        doc = cls.TestUser.create_user(username="cardoso", email="cardoso@anon.com", password="abc123-")
+        result = User.create_user(username="cardoso", email="cardoso@anon.com", password="abc123-")
+        cls.assertEqual(result.username, doc.username)
+        cls.assertEqual(result.email, doc.email)
+        cls.assertEqual(result.password, doc.password)
 
 
 class EndpointStatusTestCase(TestCase):
@@ -26,7 +42,7 @@ class EndpointStatusTestCase(TestCase):
         doc = JsonResponse({'status': 'ok'})
         request = client.get("status/")
         self.assertEqual(check_endpoint_status(request).content, doc.content)
-        self.assertEqual(check_endpoint_status(request).content, doc.content)
+        self.assertEqual(check_endpoint_status(request).status_code, doc.status_code)
 
 
 class SignUpTestCase(TestCase):
