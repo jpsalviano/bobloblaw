@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase, Client
 from django.db import models
 from django.http import JsonResponse
@@ -47,4 +49,12 @@ class EndpointStatusTestCase(TestCase):
 
 class SignUpTestCase(TestCase):
     def setUp(self):
-        User.create_user(username="cardoso", email="cardoso@anon.com", password="abc123-")
+        self.user = User.create_user(username="cardoso", email="cardoso@anon.com", password="abc123-")
+        self.user.save()
+
+    def test_sign_up_endpoint_creates_user(self):
+        doc = JsonResponse({'user_created': 'ok'})
+        print(self.user)
+        user = str(self.user)
+        request = client.post("accounts/signup/", json.dumps(self.user))
+        result = (SignUp.sign_up(request))
