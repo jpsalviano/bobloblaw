@@ -6,6 +6,6 @@ from .sign_in import SignIn
 
 urlpatterns = [
     path('status/', check_endpoint_status, name="check_status"),
-    path('signup/', SignUp.sign_up, name="create_user"),
-    path('signin/', SignIn.sign_in, name="create_session")
+    path('signup/', SignUp.as_view(), name="create_user"),
+    path('signin/', SignIn.as_view(), name="create_session")
 ]
