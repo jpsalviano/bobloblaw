@@ -1,5 +1,4 @@
 import json
-import bcrypt
 from secrets import token_hex
 
 from .models import User, Session

@@ -7,7 +7,9 @@ from django.http import JsonResponse
 from django.urls import reverse
 
 from .models import User
-from .views import check_endpoint_status, SignUp, SignIn
+from .views import check_endpoint_status
+from .sign_up import SignUp
+from .sign_in import SignIn
 
 
 class UserModelTestCase(TestCase):
@@ -47,7 +49,6 @@ class SignUpTestCase(TestCase):
 
 
     def test_sign_up_encrypts_password(self):
-        # dúvida: ValueError: Invalid salt quando uso a checkpw() e a hash produzida pelo endpoint, não essa criada de dentro do teste
         self.client.post(reverse('create_user'), self.create_user_post_request_data, content_type="application/json")
         stored_password = User.objects.get(email="john@gmail.com").password
         self.assertEqual(len(stored_password), 63)
