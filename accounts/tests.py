@@ -63,14 +63,17 @@ class SignInTestCase(TestCase):
         session = Session.objects.filter(user=self.user.id)
         self.assertTrue(session.exists())
 
-    def test_sign_in_creates_session_token(self):
-        create_session_post_request_data = {"username": "cardoso", "password": "abc123-"}
-        result = self.client.post(reverse("create_session"), create_session_post_request_data, content_type="application/json")
-        self.assertTrue(result.json())
-
     def test_sign_in_does_not_validate_wrong_password(self):
         create_session_post_request_data = {"username": "cardoso", "password": "-abc123"}
         result = self.client.post(reverse("create_session"), create_session_post_request_data, content_type="application/json")
         self.assertEqual(result.json(), {"error": "wrong password"})
         session = Session.objects.filter(user=self.user.id)
         self.assertFalse(session.exists())
+
+    def test_sign_in_creates_session_token(self):
+        create_session_post_request_data = {"username": "cardoso", "password": "abc123-"}
+        result = self.client.post(reverse("create_session"), create_session_post_request_data, content_type="application/json")
+        self.assertEqual(result.json(), {"logged": "true"})
+        session = Session.objects.get(user=self.user.id)
+        self.assertTrue(hasattr(session, "session_token"))
+        self.assertEqual(len(session.session_token), 64)
