@@ -68,10 +68,9 @@
         - criar modelo de session (com user_id como foreign key e on_delete cascade)
         - enviar um request com body em json com usuário e senha de User já registrado no sistema
         - validar se informações batem com as que estão no banco de dados
-            - bcrypt para fazer hash da password
+        - bcrypt para fazer hash da password inserido como override da função save no modelo de user
         - retornar um token de sessao como cookie e um body em json 
             - token criado por secrets.token_hex()
-            - body ?
 
     - *retorna um token e um status de ok*
 - front-end
