@@ -1,31 +1,21 @@
-#### ***Task***: Fazer um sistema de autenticação usando Django e React
+#### ***Task 1***: Fazer um sistema de autenticação usando Django e React
 
-##### Model View Controller pattern (padrão de projeto)
-- A camada **Model** é o coração da aplicação, onde se localizam as regras de negócio, as entidades, a camada de acesso a dados, validação
-- A camada **View** é responsável por renderizar a resposta à requisição (JavaScript, CSS, HTML, Template Engine)
-- No meio das duas camadas anteriores, temos o **Controller**, coordenando o fluxo da aplicação
-
-![Diagram From Wikipedia, the free encyclopedia](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/MVC-Process.svg/200px-MVC-Process.svg.png)
-
-- **Analogia Aplicação MVC x Prédio comercial**
-    - o recepcionista do prédio é o framework MVC/front-controller. Ele recebe as requisições, pode consultar algum arquivo de metadados (xml, json) que possua por exemplo o mapeamento das rotas (qual url aponta para qual método). Ele encaminha para o "setor responsável" a requisição feita pelo usuário.
-    - a pessoa que recebe a requisição das mãos do recepcionista, leva ao setor responsável e traz a resposta é o controller. O controller sabe quais informações são necessárias para gerar a view, requisita ao model tais informações e transmite a resposta para quem solicitou.
-- O **browser** gera uma requisição a partir de uma URL e envia a --> um **web server** (e.g. Apache), que usando essa URL, direciona ao alvo da requisição, --> uma **aplicação**, na sua camada **controller**.
-- Se não houver necessidade de se acessar dados (por exemplo, um GET para renderizar a página inicial du uma simples aplicação que não exija validação de nenhuma regra), o **controller** encaminha a requisição ao **view**, que renderiza a resposta enviada ao browser.
-- Caso haja a necessidade de se acessar dados para gerar a resposta, o **controller** direciona a requisição ao **model**, que acessa o banco de dados e devolve as informações ao **controller**. Essa operação se repetirá até que o **controller** tenha obtido as informações necessárias para atender a requisição e encaminhá-las para o **view**, que finalmente renderizará a resposta ao browser.
-
-##### Qual o papel do Django e do React no MVC
-- O React atua sobre a camada **view** da aplicação, recebendo as informações do **controller** para renderizar as respostas ao usuário
-- O Django, por sua vez, se ocupará das camadas
-    - **controller**: mapeamento de rotas, entrypoint e endpoints, julgando se há necessidade de acessar dados, podendo direcionar a requisição tanto para o model (quando há essa necessidade) quanto para a view (quando não há).
-    - **model**: regras de neǵocio, validações, camada de acesso ao banco de dados. É instanciado pelo controller e responde a essa mesma camada para o fluxo da aplicação.
-
-##### Qual os passos para a aplicação prática?
 - *iniciar uma aplicação do Django*
     - create repository on github (branch `main`)
     - `git clone projectFolder` (when you clone you don't need to add a remote like `git remote add origin <url>`)
     - `django-admin startproject projectName projectFolder`
-    - ??? should I add `settings.py` to .gitignore ???
+    - always add `settings.py` to .gitignore 
+    - A questão é que você vai ter mais de um settings (um pra dev, outro pra prod, etc) e o settings a ser usado vai ser setado por uma variável de ambiente
+        - *important*: Django Tips #20 Working With Multiple Settings Modules https://simpleisbetterthancomplex.com/tips/2017/07/03/django-tip-20-working-with-multiple-settings-modules.html
+        - Separating Sensitive Data from Code (using python-decouple) https://dev.to/jjokah/separating-sensitive-data-from-code-using-python-decouple-5gj4
+        - `$ pip install python-decouple`
+        - go to settings.py (base.py)
+        - `from decouple import config` 
+        - `SECRET_KEY =  config("SECRET_KEY")`
+        - Add .env file at the root of your project
+        - `touch .env`
+        - Make sure .env is added to your .gitignore file
+        - Now you can define those environment variables in the .env file
     - `git push -u origin main`
     - ??? save `SECRET_KEY` and database password as environment variables -> is this effective? what else can be done? ???
 - *utilizar o sistema de usuários builtin*
@@ -55,12 +45,12 @@
     - With these settings in place, running the command `manage.py migrate` creates the necessary database tables for auth related models and permissions for any models defined in your installed apps
     - add url pattern to admin urls targeting accounts urls
     - add a urls.py to accounts app and target route 'signup/' to signup view
-    - `import .view`, and then `path('signup/', <callable from .view>)`
+    - `import .view`, and then `path('signup/', View.as_vew(), "signup")`
     - add view for responding to `request` -> `from django.http import JsonResponse`
     - create a function on the view that takes the `request.body.decode()` and load it to json (`json.loads()`)
     - it will read a string a cast it to a json object so you can use the info to create a User object
     - The keyword arguments are the names of the fields you’ve defined on your model. Note that instantiating a model in no way touches your database; for that, you need to `save()`
-    - Passwords are never saved in the database on plain text format. It needs to be hashed before - that is, a cryptography is applied to it: `bcrypt.hashpw(password.encode(), bcrypt.gensalt()`
+    - Passwords are never saved in the database on plain text format. It needs to be hashed before - that is, a cryptography is applied to it: `bcrypt.hashpw(password.encode(), bcrypt.gensalt())`
     - The HTTP `201 Created` success status response code indicates that the request has succeeded and has led to the creation of a resource.
 
 - *endpoint de logar*
