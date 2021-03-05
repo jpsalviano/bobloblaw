@@ -35,15 +35,15 @@ class EndpointStatusTestCase(TestCase):
 class SignUpTestCase(TestCase):
     def setUp(self):
         self.client = Client()
-        self.create_user_post_request_data = {"username": "johnsmith", "email": "john@gmail.com", "password": "abc123-"}    
+        self.create_user_post_request_data = {"username": "johnsmith", "email": "john@gmail.com", "password": "abc123-"}
 
     def test_sign_up_creates_user(self):
-        expected_result = JsonResponse({"user_created": "ok"})
+        expected_result = {"user_created": "ok"}
         result = self.client.post(reverse('create_user'), self.create_user_post_request_data, content_type="application/json")
-        user = User.objects.filter(email="john@gmail.com") ## que objeto ele vai retornar e a diferença entre o get e o filter
+        user = User.objects.filter(email="john@gmail.com")
         self.assertTrue(user.exists())
-        self.assertEqual("johnsmith", User.objects.get(email="john@gmail.com").username)
-        self.assertEqual(result.json(), json.loads(expected_result.content))
+        self.assertEqual("johnsmith", user.first().username) ## o filter retorna um query set (lista), que pode ser acessada com [] ou outros metodos
+        self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 201)
 
     def test_sign_up_encrypts_password(self):
