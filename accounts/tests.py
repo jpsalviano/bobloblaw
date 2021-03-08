@@ -5,6 +5,7 @@ from django.test import TestCase, Client
 from django.db import models
 from django.http import JsonResponse
 from django.urls import reverse
+from django.core import exceptions
 
 from .models import User, Session
 from .views import check_endpoint_status
@@ -35,21 +36,38 @@ class EndpointStatusTestCase(TestCase):
 class SignUpTestCase(TestCase):
     def setUp(self):
         self.client = Client()
-        self.create_user_post_request_data = {"username": "johnsmith", "email": "john@gmail.com", "password": "abc123-"}
+        self.payload = {"username": "johnsmith",
+                        "email": "john@gmail.com",
+                        "password1": "abc123-",
+                        "password2": "abc123-"}
 
     def test_sign_up_creates_user(self):
         expected_result = {"user_created": "ok"}
-        result = self.client.post(reverse('create_user'), self.create_user_post_request_data, content_type="application/json")
+        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         user = User.objects.filter(email="john@gmail.com")
         self.assertTrue(user.exists())
-        self.assertEqual("johnsmith", user.first().username) ## o filter retorna um query set (lista), que pode ser acessada com [] ou outros metodos
+        self.assertEqual("johnsmith", user.first().username)
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 201)
 
     def test_sign_up_encrypts_password(self):
-        self.client.post(reverse('create_user'), self.create_user_post_request_data, content_type="application/json")
+        self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         stored_password = User.objects.get(email="john@gmail.com").password
         self.assertEqual(len(stored_password), 60)
+
+    def test_sign_up_raises_validation_error_exception_if_passwords_are_different(self):
+        self.payload["password2"] = "-abc123"
+        with self.assertRaises(exceptions.ValidationError) as error:
+            result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(error.exception.message, "Passwords do not match.")
+        user = User.objects.filter(email="john@gmail.com")
+        self.assertFalse(user.exists())
+
+    def test_sign_up_raises_validation_error_ir_username_is_too_short(self):
+        self.payload["username"] = "jao"
+        with self.assertRaises(exceptions.ValidationError) as error:
+            result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(error.exception.message, "")
 
 
 class SignInTestCase(TestCase):
