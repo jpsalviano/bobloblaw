@@ -13,8 +13,9 @@ class SignUp(View):
             payload = json.loads(request.body)
             password = self.validate_password(payload)
             username = self.validate_username(payload)
-            User.objects.create(username=username, email=payload["email"], password=password)
-            response = JsonResponse({"user_created": "ok"})
+            email = payload["email"]
+            User.objects.create(username=username, email=email, password=password)
+            response = JsonResponse({"username": username, "email": email})
             response.status_code = 201
             return response
         except Exception as e:

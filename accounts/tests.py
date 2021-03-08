@@ -16,7 +16,9 @@ from .sign_in import SignIn
 class UserModelTestCase(TestCase):
 
     def test_user_model_class(self):
-        user = User.objects.create(username="cardoso", email="cardoso@anon.com", password="abc123-")
+        user = User.objects.create(username="cardoso",
+                                   email="cardoso@anon.com",
+                                   password="abc123-")
         self.assertTrue(hasattr(user, "username"))
         self.assertTrue(hasattr(user, "email"))
         self.assertTrue(hasattr(user, "password"))
@@ -42,11 +44,11 @@ class SignUpTestCase(TestCase):
                         "password2": "abc123-"}
 
     def test_sign_up_creates_user(self):
-        expected_result = {"user_created": "ok"}
+        expected_result = {"username": "johnsmith", "email": "john@gmail.com"}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         user = User.objects.filter(email="john@gmail.com")
         self.assertTrue(user.exists())
-        self.assertEqual("johnsmith", user.first().username)
+        self.assertEqual(user.first().username, expected_result["username"])
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 201)
 
@@ -74,7 +76,6 @@ class SignUpTestCase(TestCase):
         self.assertEqual(error.exception.message, "Username is too long.")
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
-
 
 
 class SignInTestCase(TestCase):
