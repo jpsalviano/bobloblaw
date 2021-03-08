@@ -65,6 +65,12 @@ class SignUpTestCase(TestCase):
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
+    def test_sign_up_raises_validation_error_exception_if_username_was_not_entered(self):
+        self.payload["username"] = ""
+        with self.assertRaises(exceptions.ValidationError) as error:
+            result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(error.exception.message, "Username was not entered.")
+
     def test_sign_up_raises_validation_error_exception_if_username_is_too_short_or_too_long(self):
         self.payload["username"] = "jao"
         with self.assertRaises(exceptions.ValidationError) as error:
@@ -102,13 +108,6 @@ class SignInTestCase(TestCase):
         session = Session.objects.filter(user=self.user.id)
         self.assertTrue(session.exists())
 
-    def test_sign_in_does_not_validate_wrong_password(self):
-        create_session_post_request_data = {"username": "cardoso", "password": "-abc123"}
-        result = self.client.post(reverse("create_session"), create_session_post_request_data, content_type="application/json")
-        self.assertEqual(result.json(), {"error": "wrong password"})
-        session = Session.objects.filter(user=self.user.id)
-        self.assertFalse(session.exists())
-
     def test_sign_in_creates_session_token(self):
         create_session_post_request_data = {"username": "cardoso", "password": "abc123-"}
         result = self.client.post(reverse("create_session"), create_session_post_request_data, content_type="application/json")
@@ -116,3 +115,10 @@ class SignInTestCase(TestCase):
         session = Session.objects.get(user=self.user.id)
         self.assertTrue(hasattr(session, "session_token"))
         self.assertEqual(len(session.session_token), 64)
+
+    def test_sign_in_does_not_validate_wrong_password(self):
+        create_session_post_request_data = {"username": "cardoso", "password": "-abc123"}
+        result = self.client.post(reverse("create_session"), create_session_post_request_data, content_type="application/json")
+        self.assertEqual(result.json(), {"error": "wrong password"})
+        session = Session.objects.filter(user=self.user.id)
+        self.assertFalse(session.exists())

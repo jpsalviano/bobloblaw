@@ -27,8 +27,11 @@ class SignUp(View):
 
     def validate_username(self, payload):
         username = payload["username"]
-        self.validate_username_length(username)
-        self.validate_username_already_picked(username)
+        if username:
+            self.validate_username_length(username)
+            self.validate_username_already_picked(username)
+        else:
+            raise exceptions.ValidationError("Username was not entered.")
         return username
 
     def validate_username_length(self, username):
