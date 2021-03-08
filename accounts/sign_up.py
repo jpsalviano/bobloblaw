@@ -12,7 +12,7 @@ class SignUp(View):
         payload = json.loads(request.body)
         password = self.validate_password(payload)
         username = self.validate_username(payload)
-        email = payload["email"]
+        email = self.validate_email(payload)
         User.objects.create(username=username, email=email, password=password)
         response = JsonResponse({"username": username, "email": email})
         response.status_code = 201
@@ -41,3 +41,9 @@ class SignUp(View):
     def validate_username_already_picked(self, username):
         if User.objects.filter(username=username):
             raise exceptions.ValidationError("Username is already in use, pick another one.")
+
+    def validate_email(self, payload):
+        email = payload["email"]
+        if User.objects.filter(email=email):
+            raise exceptions.ValidationError("Email is already in use, choose another one.")
+        return email

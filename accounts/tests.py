@@ -83,6 +83,13 @@ class SignUpTestCase(TestCase):
             result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(error.exception.message, "Username is already in use, pick another one.")
 
+    def test_sign_up_raises_validation_error_exception_if_email_is_already_in_use(self):
+        self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.payload["username"] = "smithjohn"
+        with self.assertRaises(exceptions.ValidationError) as error:
+            result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(error.exception.message, "Email is already in use, choose another one.")
+
 
 class SignInTestCase(TestCase):
     def setUp(self):
