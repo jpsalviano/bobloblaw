@@ -9,17 +9,14 @@ from .models import User
 
 class SignUp(View):
     def post(self, request):
-        try:
-            payload = json.loads(request.body)
-            password = self.validate_password(payload)
-            username = self.validate_username(payload)
-            email = payload["email"]
-            User.objects.create(username=username, email=email, password=password)
-            response = JsonResponse({"username": username, "email": email})
-            response.status_code = 201
-            return response
-        except Exception as e:
-            raise e
+        payload = json.loads(request.body)
+        password = self.validate_password(payload)
+        username = self.validate_username(payload)
+        email = payload["email"]
+        User.objects.create(username=username, email=email, password=password)
+        response = JsonResponse({"username": username, "email": email})
+        response.status_code = 201
+        return response
 
     def validate_password(self, payload):
         password1, password2 = payload["password1"], payload["password2"]
@@ -31,6 +28,7 @@ class SignUp(View):
     def validate_username(self, payload):
         username = payload["username"]
         self.validate_username_length(username)
+        self.validate_username_already_picked(username)
         return username
 
     def validate_username_length(self, username):
@@ -39,3 +37,7 @@ class SignUp(View):
                 raise exceptions.ValidationError("Username is too long.")
         else:
             raise exceptions.ValidationError("Username is too short.")
+
+    def validate_username_already_picked(self, username):
+        if User.objects.filter(username=username):
+            raise exceptions.ValidationError("Username is already in use, pick another one.")

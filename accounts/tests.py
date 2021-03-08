@@ -77,6 +77,12 @@ class SignUpTestCase(TestCase):
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
+    def test_sign_up_raises_validation_error_exception_if_username_is_already_picked(self):
+        self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        with self.assertRaises(exceptions.ValidationError) as error:
+            result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(error.exception.message, "Username is already in use, pick another one.")
+
 
 class SignInTestCase(TestCase):
     def setUp(self):
