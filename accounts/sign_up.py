@@ -29,10 +29,12 @@ class SignUp(View):
 
     def validate_username(self, payload):
         username = payload["username"]
+        self.validate_username_length(username)
+        return username
+
+    def validate_username_length(self, username):
         if len(username) > 4:
-            if len(username) < 21:
-                return username
-            else:
+            if len(username) > 20:
                 raise exceptions.ValidationError("Username is too long.")
         else:
             raise exceptions.ValidationError("Username is too short.")

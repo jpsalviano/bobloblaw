@@ -63,7 +63,7 @@ class SignUpTestCase(TestCase):
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
-    def test_sign_up_raises_validation_error_ir_username_is_too_short_or_too_long(self):
+    def test_sign_up_raises_validation_error_exception_if_username_is_too_short_or_too_long(self):
         self.payload["username"] = "jao"
         with self.assertRaises(exceptions.ValidationError) as error:
             result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
