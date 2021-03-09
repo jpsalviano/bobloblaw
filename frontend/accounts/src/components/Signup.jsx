@@ -2,7 +2,9 @@ import React from 'react'
 
 
 function GenerateSignUpForm() {
-    return <h1>Sign Up Form</h1>
+    return <div classname='SignUpForm'>
+        <h3>Sign Up Form</h3>
+    </div>
 };
 
 export default GenerateSignUpForm;
