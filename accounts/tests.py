@@ -97,7 +97,7 @@ class SignUpTestCase(TestCase):
         self.assertEqual(result.json(), expected_result)
 
 
-'''class SignInTestCase(TestCase):
+class SignInTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create(username="cardoso",
@@ -106,8 +106,9 @@ class SignUpTestCase(TestCase):
 
     def test_sign_in_validates_hashed_password(self):
         payload = {"username": "cardoso", "password": "abc123-"}
+        expected_result = {"username": "cardoso"}
         result = self.client.post(reverse("create_session"), payload, content_type="application/json")
-        self.assertEqual(result)
+        self.assertEqual(result.json(), expected_result)
 
     def test_sign_in_creates_session_token(self):
         payload = {"username": "cardoso", "password": "abc123-"}
@@ -118,9 +119,9 @@ class SignUpTestCase(TestCase):
 
     def test_sign_in_does_not_validate_wrong_password(self):
         payload = {"username": "cardoso", "password": "-abc123"}
-        with self.assertRaises(exceptions.ValidationError) as error:
-            result = self.client.post(reverse("create_session"), payload, content_type="application/json")
-        self.assertEqual(error.exception.message, "Wrong password.")
+        expected_result = {"error": "Wrong password."}
+        result = self.client.post(reverse("create_session"), payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
         session = Session.objects.filter(user=self.user.id)
         self.assertFalse(session.exists())
-'''
