@@ -57,7 +57,7 @@ class SignUpTestCase(TestCase):
         stored_password = User.objects.get(email="john@gmail.com").password
         self.assertEqual(len(stored_password), 60)
 
-    def test_sign_up_raises_validation_error_exception_if_passwords_are_different(self):
+    def test_sign_up_responds_error_if_passwords_are_different(self):
         self.payload["password2"] = "-abc123"
         expected_result = {"error": "Passwords do not match."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
@@ -66,14 +66,14 @@ class SignUpTestCase(TestCase):
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
-    def test_sign_up_raises_validation_error_exception_if_username_was_not_entered(self):
+    def test_sign_up_responds_error_if_username_was_not_entered(self):
         self.payload["username"] = ""
         expected_result = {"error": "Username cannot be null."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
 
-    def test_sign_up_raises_validation_error_exception_if_username_is_too_short_or_too_long(self):
+    def test_sign_up_responds_error_if_username_is_too_short_or_too_long(self):
         self.payload["username"] = "jao"
 
         expected_result = {"error": "Username is too short."}
@@ -89,14 +89,14 @@ class SignUpTestCase(TestCase):
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
-    def test_sign_up_raises_validation_error_exception_if_username_is_already_picked(self):
+    def test_sign_up_responds_error_if_username_is_already_picked(self):
         self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         expected_result = {"error": "Username is already picked."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
 
-    def test_sign_up_raises_validation_error_exception_if_email_is_already_in_use(self):
+    def test_sign_up_responds_error_if_email_is_already_in_use(self):
         self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         expected_result = {"error": "Email is already in use."}
         self.payload["username"] = "smithjohn"
@@ -116,16 +116,18 @@ class SignInTestCase(TestCase):
         payload = {"username": "cardoso", "password": "abc123-"}
         expected_result = {"username": "cardoso"}
         result = self.client.post(reverse("create_session"), payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(len(result.json()["session_token"]), 64)
         self.assertEqual(result.status_code, 201)
 
-    def test_sign_in_creates_session_token(self):
+    def test_sign_in_creates_and_responds_session_token(self):
         payload = {"username": "cardoso", "password": "abc123-"}
         result = self.client.post(reverse("create_session"), payload, content_type="application/json")
+        self.assertEqual(len(result.json()["session_token"]), 64)
         self.assertEqual(result.status_code, 201)
         session = Session.objects.get(user=self.user.id)
         self.assertTrue(hasattr(session, "session_token"))
         self.assertEqual(len(session.session_token), 64)
+        self.assertEqual(session.session_token, result.json()["session_token"])
 
     def test_sign_in_does_not_validate_wrong_password(self):
         payload = {"username": "cardoso", "password": "-abc123"}
@@ -135,3 +137,10 @@ class SignInTestCase(TestCase):
         self.assertEqual(result.status_code, 403)
         session = Session.objects.filter(user=self.user.id)
         self.assertFalse(session.exists())
+
+    def test_sign_in_responds_error_non_existent_username_is_entered(self):
+        payload = {"username": "cardoso123", "password": "-abc123"}
+        expected_result = {"error": "Username does not exist."}
+        result = self.client.post(reverse("create_session"), payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
