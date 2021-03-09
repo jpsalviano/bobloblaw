@@ -57,9 +57,27 @@ class SignUpTestCase(TestCase):
         stored_password = User.objects.get(email="john@gmail.com").password
         self.assertEqual(len(stored_password), 60)
 
+    def test_sign_up_responds_error_if_passwords_are_too_short(self):
+        self.payload["password1"] = self.payload["password2"] = "abc12-"
+        expected_result = {"error": "Password must be at least 7 characters long."}
+        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
+        user = User.objects.filter(email="john@gmail.com")
+        self.assertFalse(user.exists())
+
     def test_sign_up_responds_error_if_passwords_are_different(self):
         self.payload["password2"] = "-abc123"
         expected_result = {"error": "Passwords do not match."}
+        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
+        user = User.objects.filter(email="john@gmail.com")
+        self.assertFalse(user.exists())
+
+    def test_sign_up_responds_error_if_any_of_passwords_are_not_provided(self):
+        del self.payload["password2"]
+        expected_result = {"error": "You must enter the password twice."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
