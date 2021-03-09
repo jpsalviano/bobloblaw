@@ -62,6 +62,7 @@ class SignUpTestCase(TestCase):
         expected_result = {"error": "Passwords do not match."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
@@ -70,16 +71,21 @@ class SignUpTestCase(TestCase):
         expected_result = {"error": "Username cannot be null."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
 
     def test_sign_up_raises_validation_error_exception_if_username_is_too_short_or_too_long(self):
         self.payload["username"] = "jao"
+
         expected_result = {"error": "Username is too short."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
         self.payload["username"] = "jao"*7
+
         expected_result = {"error": "Username is too long."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
@@ -88,6 +94,7 @@ class SignUpTestCase(TestCase):
         expected_result = {"error": "Username is already picked."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
 
     def test_sign_up_raises_validation_error_exception_if_email_is_already_in_use(self):
         self.client.post(reverse('create_user'), self.payload, content_type="application/json")
@@ -95,6 +102,7 @@ class SignUpTestCase(TestCase):
         self.payload["username"] = "smithjohn"
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
 
 
 class SignInTestCase(TestCase):
@@ -109,10 +117,12 @@ class SignInTestCase(TestCase):
         expected_result = {"username": "cardoso"}
         result = self.client.post(reverse("create_session"), payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 201)
 
     def test_sign_in_creates_session_token(self):
         payload = {"username": "cardoso", "password": "abc123-"}
         result = self.client.post(reverse("create_session"), payload, content_type="application/json")
+        self.assertEqual(result.status_code, 201)
         session = Session.objects.get(user=self.user.id)
         self.assertTrue(hasattr(session, "session_token"))
         self.assertEqual(len(session.session_token), 64)

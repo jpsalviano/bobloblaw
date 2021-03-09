@@ -20,6 +20,7 @@ class SignUp(View):
             return response
         except exceptions.ValidationError as error:
             response = JsonResponse({"error": error.message})
+            response.status_code = 403
             return response
 
     def validate_password(self, payload):

@@ -19,7 +19,9 @@ class SignIn(View):
             user = User.objects.get(username=username)
             password = self.validate_password(payload, user)
             session = Session.objects.create(user=user, session_token=token_hex(32))
-            return JsonResponse({"username": username})
+            response = JsonResponse({"username": username})
+            response.status_code = 201
+            return response
         except exceptions.ValidationError as error:
             response = JsonResponse({"error": error.message})
             response.status_code = 403
