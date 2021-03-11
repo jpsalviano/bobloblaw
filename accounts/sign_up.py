@@ -25,18 +25,14 @@ class SignUp(View):
 
     def validate_password(self, payload):
         try:
-            password1, password2 = payload["password1"], payload["password2"]
-        except:
-            raise exceptions.ValidationError("You must enter the password twice.")
+            password = payload["password"]
+        except KeyError:
+            raise exceptions.ValidationError("You must enter a password.")
         try:
-            assert password1 == password2
-        except:
-            raise exceptions.ValidationError("Passwords do not match.")
-        try:
-            assert len(password1) > 6
+            assert len(password) > 6
         except:
             raise exceptions.ValidationError("Password must be at least 7 characters long.")
-        return password1
+        return password
 
     def validate_username(self, payload):
         username = payload["username"]

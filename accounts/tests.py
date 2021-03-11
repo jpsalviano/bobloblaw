@@ -40,8 +40,7 @@ class SignUpTestCase(TestCase):
         self.client = Client()
         self.payload = {"username": "johnsmith",
                         "email": "john@gmail.com",
-                        "password1": "abc123-",
-                        "password2": "abc123-"}
+                        "password": "abc123-",}
 
     def test_sign_up_creates_user(self):
         expected_result = {"username": "johnsmith", "email": "john@gmail.com"}
@@ -58,7 +57,7 @@ class SignUpTestCase(TestCase):
         self.assertEqual(len(stored_password), 60)
 
     def test_sign_up_responds_error_if_passwords_are_too_short(self):
-        self.payload["password1"] = self.payload["password2"] = "abc12-"
+        self.payload["password"] = "abc12-"
         expected_result = {"error": "Password must be at least 7 characters long."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
@@ -66,18 +65,9 @@ class SignUpTestCase(TestCase):
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
-    def test_sign_up_responds_error_if_passwords_are_different(self):
-        self.payload["password2"] = "-abc123"
-        expected_result = {"error": "Passwords do not match."}
-        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
-        self.assertEqual(result.status_code, 403)
-        user = User.objects.filter(email="john@gmail.com")
-        self.assertFalse(user.exists())
-
-    def test_sign_up_responds_error_if_any_of_passwords_are_not_provided(self):
-        del self.payload["password2"]
-        expected_result = {"error": "You must enter the password twice."}
+    def test_sign_up_responds_error_if_password_is_not_provided(self):
+        del self.payload["password"]
+        expected_result = {"error": "You must enter a password."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
@@ -93,17 +83,17 @@ class SignUpTestCase(TestCase):
 
     def test_sign_up_responds_error_if_username_is_too_short_or_too_long(self):
         self.payload["username"] = "jao"
-
         expected_result = {"error": "Username is too short."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
+        
         self.payload["username"] = "jao"*7
-
         expected_result = {"error": "Username is too long."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
+        
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
 
