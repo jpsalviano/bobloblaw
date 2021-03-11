@@ -18,7 +18,7 @@ export default function SignUp() {
   };*/
 
   const enviaCadastro = () => {
-    return console.log();
+    return console.log("cadastro enviado");
   }
 
   return (
