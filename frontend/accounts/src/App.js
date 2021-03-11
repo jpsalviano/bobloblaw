@@ -1,44 +1,85 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Form, Button, Container } from 'react-bootstrap';
 
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.username = {value: ''};
-    this.email = {value: ''};
-    this.password1 = {value: ''};
-    this.password2 = {value: ''};
+export default function SignUp() {
+  const [usuario, setUsuario] = useState('');
+  const [email, setEmail] = useState('');
+  const [confirmaEmail, setConfirmaEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmaSenha, setConfirmaSenha] = useState('');
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+/*  const limpaForm = () => {
+    setUsuario('');
+    setEmail('');
+    setConfirmaEmail('');
+    setSenha('');
+    setConfirmaSenha('');
+  };*/
+
+  const enviaCadastro = () => {
+    return console.log();
   }
 
-  handleChange(event) {
-    this.setState({value: event.target.value});
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-  }
-
-  render() {
-    return (
-      <form 
-      className="sign-up-form"
-      onSubmit={this.handleSubmit}
-      noValidate
-      >
-        <label>
-          Sign Up!
-          <input type="text" value={this.username.value} onChange={(e) => this.setState({username: e.target.value})} />
-          <input type="email" value={this.email.value} onChange={(e) => this.setState({email: e.target.value})} />
-          <input type="password" value={this.password1.value} onChange={(e) => this.setState({password1: e.target.value})} />
-          <input type="password" value={this.password2.value} onChange={(e) => this.setState({password2: e.target.value})} />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
+  return (
+    <Container>
+      <Form onSubmit={enviaCadastro()}>
+        <Form.Group>
+          <Form.Label>Usuário
+          <Form.Control
+              value={usuario}
+              placeholder="Digite o nome de usuário"
+              onChange={(e) => setUsuario(e.target.value)}
+          />
+          </Form.Label>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Email
+          <Form.Control
+            value={email}
+            type="email"
+            placeholder="Digite o seu email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          </Form.Label>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Confirmação de email
+          <Form.Control
+            value={confirmaEmail}
+            type="email"
+            placeholder="Confirme o seu email"
+            onChange={(e) => setConfirmaEmail(e.target.value)}
+          />
+          </Form.Label>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Senha
+          <Form.Control
+            value={senha}
+            type="password"
+            placeholder="Digite a sua senha"
+            onChange={(e) => setSenha(e.target.value)}
+          />
+          </Form.Label>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Confirmação de senha
+          <Form.Control
+            value={confirmaSenha}
+            type="password"
+            placeholder="Confirme a sua senha"
+            onChange={(e) => setConfirmaSenha(e.target.value)}
+          />
+          </Form.Label>
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          Cadastrar
+        </Button>
+        <Button variant="secondary" href="/" className="mr-2">
+          Voltar
+        </Button>
+      </Form>
+    </Container>
     );
-  }
 }
-
-export default App;
