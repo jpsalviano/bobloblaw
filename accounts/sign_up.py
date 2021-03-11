@@ -35,7 +35,10 @@ class SignUp(View):
         return password
 
     def validate_username(self, payload):
-        username = payload["username"]
+        try:
+            username = payload["username"]
+        except KeyError:
+            raise exceptions.ValidationError("You must enter a username.")
         if username:
             self.validate_username_length(username)
             self.validate_username_already_picked(username)
@@ -55,7 +58,10 @@ class SignUp(View):
             raise exceptions.ValidationError("Username is already picked.")
 
     def validate_email(self, payload):
-        email = payload["email"]
+        try:
+            email = payload["email"]
+        except KeyError:
+            raise exceptions.ValidationError("You must enter an email.")
         if User.objects.filter(email=email):
             raise exceptions.ValidationError("Email is already in use.")
         return email
