@@ -22,7 +22,7 @@ export default function SignUp() {
   }
 
   return (
-    <Container>
+    <Container className="w-50">
       <Form onSubmit={enviaCadastro()}>
         <Form.Group>
           <Form.Label>Usuário
@@ -73,10 +73,10 @@ export default function SignUp() {
           />
           </Form.Label>
         </Form.Group>
-        <Button variant="primary" type="submit">
+        <Button type="submit">
           Cadastrar
         </Button>
-        <Button variant="secondary" href="/" className="mr-2">
+        <Button variant="secondary" href="/">
           Voltar
         </Button>
       </Form>
