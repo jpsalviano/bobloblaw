@@ -3,7 +3,7 @@ import { Jumbotron, Container } from 'react-bootstrap';
 
 export default function Header({ titulo, subtitulo }) {
   return (
-    <Jumbotron fluid>
+    <Jumbotron>
       <Container>
         <h1>{titulo}</h1>
         <p>{subtitulo}</p>
