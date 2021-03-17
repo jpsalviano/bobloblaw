@@ -2,12 +2,16 @@
 
 BobLobLaw is a web application.
 
-## Installation
-
-I still don't know how to `make run` both front-end and back-end but I know I will need docker to do that later.
+## Running test server
 
 ```bash
-sudo docker-compose up
+make run
+```
+
+## Automated tests
+
+```bash
+make test
 ```
 
 ## Contributing
