@@ -6,6 +6,7 @@ def deserialize_sign_up_form(payload):
     try:
         deserialized = serializers.deserialize("json", payload, ignorenonexistent=False)
         # TODO: extract strings and set to vars: username, email, password, password2
+        # deserialized is a generator; how to handle it?
         assert password == password2
     except KeyError as error:
         error = str(error).title().strip("'")
