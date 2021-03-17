@@ -11,10 +11,9 @@ from .models import User
 
 
 class SignInForm(ModelForm):
-    """docstring for SignInForm"""
-    def __init__(self, arg):
-        super(SignInForm, self).__init__()
-        self.arg = arg
+    class Meta:
+        model = User
+        fields = ["username", "email"]
         
 
 class SignIn(View):
