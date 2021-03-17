@@ -17,8 +17,3 @@ class User(models.Model):
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password.encode(), salt)
         return hashed.decode()
-
-
-class Session(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    session_token = models.CharField(max_length=64)

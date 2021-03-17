@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.core import exceptions
 
-from .models import User, Session
+from .models import User
 from .views import check_endpoint_status
 from .sign_up import SignUp
 from .sign_in import SignIn
@@ -40,16 +40,18 @@ class SignUpTestCase(TestCase):
         self.client = Client()
         self.payload = {"username": "johnsmith",
                         "email": "john@gmail.com",
-                        "password": "abc123-",}
+                        "password": "abc123-",
+                        "password2": "abc123-",}
 
     def test_sign_up_creates_user(self):
-        expected_result = {"username": "johnsmith", "email": "john@gmail.com"}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         user = User.objects.filter(email="john@gmail.com")
+        session = Session.objects.filter(user=user)
+        expected_result = {"username": "johnsmith", "email": "john@gmail.com", "session_token": None}
         self.assertTrue(user.exists())
         self.assertEqual(user.first().username, expected_result["username"])
-        self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 201)
+        self.assertEqual(result.content.decode(), json.dumps(expected_result))
 
     def test_sign_up_encrypts_password(self):
         self.client.post(reverse('create_user'), self.payload, content_type="application/json")
@@ -57,7 +59,7 @@ class SignUpTestCase(TestCase):
         self.assertEqual(len(stored_password), 60)
 
     def test_sign_up_responds_error_if_passwords_are_too_short(self):
-        self.payload["password"] = "abc12-"
+        self.payload["password"] = self.payload["password2"] = "abc12-"
         expected_result = {"error": "Password must be at least 7 characters long."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
@@ -67,7 +69,7 @@ class SignUpTestCase(TestCase):
 
     def test_sign_up_responds_error_if_password_is_not_provided(self):
         del self.payload["password"]
-        expected_result = {"error": "You must enter a password."}
+        expected_result = {"error": "You must enter the password twice."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
