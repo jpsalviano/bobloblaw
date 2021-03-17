@@ -47,14 +47,28 @@ class SignUpTestCase(TestCase):
                         "password": "abc123-",
                         "password2": "abc123-",}
 
-    def test_sign_up_responds_error_if_one_password_field_is_not_provided(self):
+    def test_sign_up_responds_error_if_one_required_field_is_not_provided(self):
         del self.payload["password"]
         expected_result = {"error": "Password must be entered twice."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 403)
+
+        self.payload["password"] = self.payload["password2"]
+        del self.payload["username"]
+        expected_result = {"error": "Username must be provided."}
+        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
         user = User.objects.filter(email="john@gmail.com")
         self.assertFalse(user.exists())
+
+    def test_sign_up_responds_error_if_passwords_dont_match(self):
+        self.payload["password"] = "-abc123"
+        expected_result = {"error": "Passwords do not match."}
+        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 403)
 
 
 
