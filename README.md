@@ -1,6 +1,6 @@
 # BobLobLaw
 
-BobLobLaw is a web application.
+BobLobLaw is a web application. For back-end development I use Django, and React for front-end.
 
 ## Running test server
 
