@@ -4,22 +4,33 @@ from secrets import token_hex
 from django.http import JsonResponse
 from django.views import View
 from django.core import exceptions
+from django.forms import ModelForm
 
 from .models import User
+from .serializers import deserialize_sign_up_form
 
 
 class SignUp(View):
     def post(self, request):
         try:
-            username, password, email = self.validate_payload(json.loads(request.body))
-            user = User.objects.create(username=username, email=email, password=password)
-            response = JsonResponse({"username": username, "email": email})
-            response.status_code = 201
-            return response
+            payload = deserialize_sign_up_form(json.loads(request.body))
+            #username, password, password_2, email = 
+            #user = User.objects.create(username=username, email=email, password=password)
+            #response = JsonResponse({"username": username, "email": email})
+            #response.status_code = 201
+            #return response
         except exceptions.ValidationError as error:
             response = JsonResponse({"error": error.message})
             response.status_code = 403
             return response
+
+
+class SignUpForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email", "password"]
+
+    
 
     def validate_password(self, payload):
             try:
