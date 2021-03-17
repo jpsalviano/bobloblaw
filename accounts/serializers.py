@@ -5,7 +5,7 @@ def deserialize_sign_up_form(payload):
     # Checks if all required fields are filled and if both passwords match
     try:
         deserialized = serializers.deserialize("json", payload, ignorenonexistent=False)
-        username, email, password, password2 = payload["username"], payload["password"], payload["password2"], payload["email"]
+        # TODO: extract strings and set to vars: username, email, password, password2
         assert password == password2
     except KeyError as error:
         error = str(error).title().strip("'")
