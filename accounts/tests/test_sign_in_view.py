@@ -1,17 +1,12 @@
 import json
-import bcrypt
 
 from django.test import TestCase, Client
-from django.db import models
 from django.urls import reverse
 from django.http import JsonResponse
 from django.core import exceptions
 
 from ..models import User
-from ..forms import SignUpForm
-from ..views.status import check_endpoint_status
-from ..views.sign_up import SignUp
-from ..views.sign_in import SignIn
+from ..views.sign_in import SignIn, validate_password
 
 
 
@@ -22,11 +17,16 @@ class SignIn(TestCase):
                                         email="cardoso@anon.com",
                                         password="abc123-")
 
-    def test_sign_in_validates_hashed_password(self):
-        payload = {"username": "cardoso", "password": "abc123-"}
-        expected_result = {"username": "cardoso"}
-        result = self.client.post(reverse("create_session"), payload, content_type="application/json")
-        self.assertEqual(result.status_code, 200)
+    def test_sign_in_invalidates_wrong_password_against_stored_hashed(self):
+        entered_password = "-abc123"
+        self.assertEqual(len(self.user.password), 60)
+        with self.assertRaises(exceptions.ValidationError) as error:
+            validate_password(entered_password, self.user.password)
+        self.assertEqual(error.exception.message, "Wrong password.")
+
+    def test_sign_in_validates_right_password_against_stored_hashed(self):
+        entered_password = "abc123-"
+        validate_password(entered_password, self.user.password)
 
 '''    def test_sign_in_creates_and_responds_session_token(self):
         payload = {"username": "cardoso", "password": "abc123-"}

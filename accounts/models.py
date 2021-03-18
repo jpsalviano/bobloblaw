@@ -13,7 +13,7 @@ class User(models.Model):
         self.password = self.encrypt_password(self.password)
         super().save(*args, **kwargs)
 
-    def encrypt_password(self, password):
+    def encrypt_password(self, password_txt):
         salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode(), salt)
-        return hashed.decode()
+        password_hash = bcrypt.hashpw(password_txt.encode(), salt)
+        return password_hash.decode()
