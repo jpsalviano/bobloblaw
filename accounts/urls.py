@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import check_endpoint_status
-from .sign_up import SignUp
-from .sign_in import SignIn
+from .views.status import check_endpoint_status
+from .views.sign_up import SignUp
+from .views.sign_in import SignIn
 
 
 urlpatterns = [

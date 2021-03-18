@@ -132,3 +132,7 @@ dmypy.json
 # Django project
 settings.py
 _BOB
+
+# VSCode
+.vscode*
+
