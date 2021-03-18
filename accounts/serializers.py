@@ -1,3 +1,5 @@
+import json
+
 from django.core import exceptions, serializers
 
 
@@ -8,7 +10,7 @@ def deserialize_sign_up_form(payload):
         # deserialized is a generator; how to handle it?
         fields = ["username", "email", "password", "password2"]
         for obj in serializers.deserialize("json", payload):
-            fields.append(obj)
+            pass
     except KeyError as error:
         error = str(error).title().strip("'")
         if "Password" in error:

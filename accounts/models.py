@@ -1,10 +1,9 @@
 import bcrypt
 
 from django.db import models
-from django.forms import ModelForm
-
 
 class User(models.Model):
+    # id = models.AutoField(primary_key=True) is set by default by Django
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=60)
@@ -19,15 +18,11 @@ class User(models.Model):
         hashed = bcrypt.hashpw(password.encode(), salt)
         return hashed.decode()
 
-
-class SignUpForm(ModelForm):
-    
-    class FormFields(models.Model):
-        username = models.CharField(max_length=30, unique=True)
-        email = models.EmailField(unique=True)
-        password = models.CharField(max_length=60)
-        password2 = models.CharField(max_length=60)
+class UserFormClass(models.Model):
+    username = models.CharField(max_length=30, unique=True)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=60)
+    password2 = models.CharField(max_length=60)
 
     class Meta:
-        model = super(FormFields)
-        fields = ["username", "email", "password", "password2"]
+        abstract = True

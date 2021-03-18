@@ -4,7 +4,8 @@ from django.http import JsonResponse
 from django.views import View
 from django.core import exceptions
 
-from .models import User, SignUpForm
+from .models import User
+from .forms import SignUpForm
 from .serializers import deserialize_sign_up_form
 
 
