@@ -6,7 +6,7 @@ class User(models.Model):
     # id = models.AutoField(primary_key=True) is set by default by Django
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=60)
+    password = models.CharField(max_length=72)
 
     def save(self, *args, **kwargs):
         self.full_clean()

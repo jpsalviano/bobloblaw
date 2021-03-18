@@ -73,7 +73,6 @@ class SignUpTestCase(TestCase):
         self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         stored_password = User.objects.get(email="john@gmail.com").password
         self.assertEqual(len(stored_password), 60)
-        self.assertTrue()
 
 '''    def test_sign_up_responds_error_if_passwords_are_too_short(self):
         self.payload["password"] = self.payload["password2"] = "abc12-"
