@@ -1,9 +1,8 @@
-from .models import UserFormClass
+from .models import User
 from django.forms import ModelForm
 
 
 class SignUpForm(ModelForm):
-    
     class Meta:
-        model = UserFormClass
-        fields = ["username", "email", "password", "password2"]
+        model = User
+        fields = ["username", "email", "password"]

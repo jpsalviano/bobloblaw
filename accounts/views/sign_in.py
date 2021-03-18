@@ -7,14 +7,14 @@ from django.views import View
 from django.core import exceptions
 from django.forms import ModelForm
 
-from .models import User
+from ..models import User
 
 
 class SignInForm(ModelForm):
     class Meta:
         model = User
         fields = ["username", "email"]
-        
+
 
 class SignIn(View):
     http_method_names = ['post']

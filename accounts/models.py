@@ -17,12 +17,3 @@ class User(models.Model):
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password.encode(), salt)
         return hashed.decode()
-
-class UserFormClass(models.Model):
-    username = models.CharField(max_length=30, unique=True)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=60)
-    password2 = models.CharField(max_length=60)
-
-    class Meta:
-        abstract = True

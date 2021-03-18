@@ -9,9 +9,9 @@ from django.core import exceptions
 
 from .models import User
 from .forms import SignUpForm
-from .views import check_endpoint_status
-from .sign_up import SignUp
-from .sign_in import SignIn
+from .views.status import check_endpoint_status
+from .views.sign_up import SignUp
+from .views.sign_in import SignIn
 
 
 class ModelsTests(TestCase):
@@ -22,12 +22,6 @@ class ModelsTests(TestCase):
         self.assertTrue(hasattr(self.user, "username"))
         self.assertTrue(hasattr(self.user, "email"))
         self.assertTrue(hasattr(self.user, "password"))
-
-    def test_signup_form_class(self):
-        self.user = User.objects.create(username="cardoso",
-                                        email="cardoso@anon.com",
-                                        password="abc123-")
-        signup_form = SignUpForm(instance=self.user)
 
 
 class EndpointStatusTestCase(TestCase):
@@ -46,51 +40,42 @@ class SignUpTestCase(TestCase):
         self.client = Client()
         self.payload = {"username": "johnsmith",
                         "email": "john@gmail.com",
-                        "password": "abc123-",
-                        "password2": "abc123-"}
-        
+                        "password": "abc123-"}
 
-    def test_sign_up_responds_error_if_one_required_field_is_not_provided(self):
-        del self.payload["password"]
-        expected_result = {"error": "Password must be entered twice."}
-        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
-        self.assertEqual(result.status_code, 403)
-
-        self.payload["password"] = self.payload["password2"]
-        del self.payload["username"]
-        expected_result = {"error": "Username must be provided."}
-        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
-        self.assertEqual(result.status_code, 403)
-        user = User.objects.filter(email="john@gmail.com")
-        self.assertFalse(user.exists())
-
-    def test_sign_up_responds_error_if_passwords_dont_match(self):
-        self.payload["password"] = "-abc123"
-        expected_result = {"error": "Passwords do not match."}
-        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
-        self.assertEqual(result.status_code, 403)
-
-
-
-'''    def test_sign_up_creates_user(self):
+    def test_sign_up_creates_user(self):
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         user = User.objects.filter(email="john@gmail.com")
-        session = Session.objects.filter(user=user)
-        expected_result = {"username": "johnsmith", "email": "john@gmail.com", "session_token": None}
+        expected_result = {"username": "johnsmith", "email": "john@gmail.com"}
         self.assertTrue(user.exists())
         self.assertEqual(user.first().username, expected_result["username"])
         self.assertEqual(result.status_code, 201)
         self.assertEqual(result.content.decode(), json.dumps(expected_result))
 
+    def test_sign_up_responds_error_if_password_is_not_provided(self):
+        del self.payload["password"]
+        expected_result = {'password': ['This field is required.']}
+        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 400)
+        user = User.objects.filter(email="john@gmail.com")
+        self.assertFalse(user.exists())
+
+    def test_sign_up_responds_error_if_username_is_not_provided(self):
+        del self.payload["username"]
+        expected_result = {'username': ['This field is required.']}
+        result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
+        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.status_code, 400)
+        user = User.objects.filter(email="john@gmail.com")
+        self.assertFalse(user.exists())
+
     def test_sign_up_encrypts_password(self):
         self.client.post(reverse('create_user'), self.payload, content_type="application/json")
         stored_password = User.objects.get(email="john@gmail.com").password
         self.assertEqual(len(stored_password), 60)
+        self.assertTrue()
 
-    def test_sign_up_responds_error_if_passwords_are_too_short(self):
+'''    def test_sign_up_responds_error_if_passwords_are_too_short(self):
         self.payload["password"] = self.payload["password2"] = "abc12-"
         expected_result = {"error": "Password must be at least 7 characters long."}
         result = self.client.post(reverse('create_user'), self.payload, content_type="application/json")
