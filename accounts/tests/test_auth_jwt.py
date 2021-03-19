@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.core.signing import Signer
 
 from ..models import User
 
@@ -14,4 +15,6 @@ class AuthJWT(TestCase):
     def test_auth_jwt_generates_token(self):
         payload = {"user_id": self.user.id}
         result = self.client.post(reverse("auth_jwt"), payload, content_type="application/json")
-        self.assertEqual(result.json(), payload)
+        key1 = Signer().sign("JWT")
+        key2 = Signer().sign("JWT")
+        self.assertEqual(key1, key2)

@@ -2,7 +2,8 @@ from django.urls import path
 from .views.status import check_endpoint_status
 from .views.sign_up import SignUp
 from .views.sign_in import SignIn
-from .views.auth_jwt import GenerateToken 
+from .views.auth_jwt import GenerateToken
+
 
 
 urlpatterns = [
