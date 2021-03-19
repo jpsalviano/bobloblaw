@@ -2,11 +2,10 @@ import json
 
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.http import JsonResponse
 from django.core import exceptions
 
 from ..models import User
-from ..views.sign_in import SignIn, validate_password
+from ..views.sign_in import validate_password
 
 
 
@@ -41,22 +40,3 @@ class SignIn(TestCase):
         result = self.client.post(reverse("sign_in"), payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 401)
-
-    def test_sign_in_creates_and_responds_session_token(self):
-        payload = {"username": "cardoso", "password": "abc123-"}
-        result = self.client.post(reverse("create_session"), payload, content_type="application/json")
-        self.assertEqual(len(result.json()["session_token"]), 64)
-        self.assertEqual(result.status_code, 201)
-        session = Session.objects.get(user=self.user.id)
-        self.assertTrue(hasattr(session, "session_token"))
-        self.assertEqual(len(session.session_token), 64)
-        self.assertEqual(session.session_token, result.json()["session_token"])
-
-'''    def test_sign_in_does_not_validate_wrong_password(self):
-        payload = {"username": "cardoso", "password": "-abc123"}
-        expected_result = {"error": "Wrong password."}
-        result = self.client.post(reverse("create_session"), payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
-        self.assertEqual(result.status_code, 403)
-        session = Session.objects.filter(user=self.user.id)
-        self.assertFalse(session.exists())'''
