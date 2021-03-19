@@ -24,17 +24,17 @@ class SignIn(View):
             response.status_code = 400
             return response
         except User.DoesNotExist:
-            response = JsonResponse({"username": ["Username does not exist."]})
+            response = JsonResponse({"error": ["Username does not exist."]})
             response.status_code = 401
             return response
-        except ValidationError as error:
-            response = JsonResponse({"password": ["Wrong password."]})
+        except exceptions.ValidationError as error:
+            response = JsonResponse({"error": ["Wrong password."]})
             response.status_code = 401
             return response
 
 
 def validate_password(password_txt, password_hash):
     try:
-        assert bcrypt.checkpw(password_txt, password_hash)
+        assert bcrypt.checkpw(password_txt.encode(), password_hash.encode())
     except:
         raise exceptions.ValidationError("Wrong password.")
