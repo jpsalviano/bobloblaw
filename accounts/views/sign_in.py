@@ -6,13 +6,13 @@ from django.views import View
 from django.core import exceptions
 
 from ..models import User
-from ..forms import UserForm
+from ..forms import SignInForm
 
 
 class SignIn(View):
     def post(self, request):
         try:
-            form = UserForm(json.loads(request.body))
+            form = SignInForm(json.loads(request.body))
             assert form.is_valid()
             user = User.objects.get(username=form.cleaned_data["username"])
             validate_password(form.cleaned_data["password"], user.password)
