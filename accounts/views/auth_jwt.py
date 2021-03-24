@@ -1,14 +1,18 @@
-import json
 import jwt
+import time
 
-from django.views import View
-from django.http import JsonResponse
 from django.core.signing import Signer
 
+from ..models import User
 
-class GenerateToken(View):
-    def post(self, request):
-        user_id = json.loads(request.body)["user_id"]
-        secret_key = Signer().sign("JWT")
-        token = jwt.encode({"user_id": user_id}, secret_key, algorithm="HS256")
-        return JsonResponse({"token": token})
+
+def _generate_token(username):
+    user_id = User.objects.filter(username=username).first().id
+    secret_key = Signer().sign("JWT")
+    payload = {
+        "usr": username,
+        "sub": user_id,
+        "exp": time.time() + 86400
+    }
+    token = jwt.encode(payload, secret_key, algorithm="HS256")
+    return token

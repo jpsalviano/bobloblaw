@@ -4,8 +4,7 @@ from django.db import models
 
 class User(models.Model):
     # id = models.AutoField(primary_key=True) is set by default by Django
-    username = models.CharField(max_length=30, unique=True)
-    email = models.EmailField(unique=True)
+    username = models.EmailField(unique=True)
     password = models.CharField(max_length=72)
 
     def save(self, *args, **kwargs):

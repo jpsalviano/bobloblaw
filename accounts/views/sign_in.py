@@ -7,6 +7,7 @@ from django.core import exceptions
 
 from ..models import User
 from ..forms import SignInForm
+from .auth_jwt import _generate_token
 
 
 class SignIn(View):
@@ -16,9 +17,7 @@ class SignIn(View):
             assert form.is_valid()
             user = User.objects.get(username=form.cleaned_data["username"])
             validate_password(form.cleaned_data["password"], user.password)
-            response = JsonResponse({"username": user.username})
-            response.status_code = 200
-            return response
+
         except AssertionError:
             response = JsonResponse(form.errors)
             response.status_code = 400
@@ -30,6 +29,11 @@ class SignIn(View):
         except exceptions.ValidationError as error:
             response = JsonResponse({"error": ["Wrong password."]})
             response.status_code = 401
+            return response
+        else:
+            access_token = _generate_token(form.cleaned_data["username"])
+            response = JsonResponse({"access_token": access_token})
+            response.status_code = 200
             return response
 
 
