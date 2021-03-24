@@ -1,4 +1,5 @@
 import json
+import jwt
 from rstr import rstr, letters, nonwhitespace
 
 from django.test import TestCase, Client
@@ -14,7 +15,7 @@ class SignIn(TestCase):
     def setUp(self):
         self.client = Client()
         self.username = f"{rstr(letters(), 5, 50)}@{rstr(letters(), 4, 40)}.com"
-        self.password = f"{rstr(nonwhitespace(), 7, 72)}"
+        self.password = f"{rstr(nonwhitespace(), 7, 60)}"
         self.user = User.objects.create(username=self.username, password=self.password)
 
     def test_sign_in_invalidates_wrong_password_against_stored_hashed(self):
@@ -39,3 +40,11 @@ class SignIn(TestCase):
         result = self.client.post(reverse("sign_in"), payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 401)
+
+    def test_sign_in_endpoint_responds_access_token(self):
+        payload = {"username": self.username,
+                   "password": self.password}
+        result = self.client.post(reverse("sign_in"), payload, content_type="application/json")
+        token = jwt.decode(json.loads(result.content.decode())["access_token"],
+                           options={"verify_signature": False})
+        self.assertEqual(token["usr"], payload["username"])

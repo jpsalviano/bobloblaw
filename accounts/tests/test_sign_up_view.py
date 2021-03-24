@@ -1,5 +1,6 @@
 import json
 from rstr import rstr, letters, nonwhitespace
+import jwt
 
 from django.test import TestCase, Client
 from django.db import models
@@ -92,3 +93,11 @@ class SignUp(TestCase):
         result = self.client.post(reverse('create_user'), payload, content_type="application/json")
         self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 400)
+
+    def test_create_user_endpoint_responds_access_token(self):
+        payload = {"username": f"{rstr(letters(), 5, 50)}@{rstr(letters(), 4, 40)}.com",
+                   "password": f"{rstr(nonwhitespace(), 7)}"}
+        result = self.client.post(reverse("create_user"), payload, content_type="application/json")
+        token = jwt.decode(json.loads(result.content.decode())["access_token"],
+                           options={"verify_signature": False})
+        self.assertEqual(token["usr"], payload["username"])
