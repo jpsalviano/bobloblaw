@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'accounts.auth_tools.auth_middleware.auth_middleware'
 ]
 
 ROOT_URLCONF = 'bobloblaw.urls'
