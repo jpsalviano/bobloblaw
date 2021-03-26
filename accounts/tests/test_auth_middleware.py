@@ -19,4 +19,5 @@ class AuthMiddleware(TestCase):
         self.sign = Signer().sign("JWT")
 
     def test_auth_middleware_reads_access_token(self):
-        pass
+        get_private_request = self.client.get(reverse("private"), {'access_token': 'invalid'})
+        self.assertEqual(get_private_request.status_code, 200)
