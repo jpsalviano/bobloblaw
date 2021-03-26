@@ -77,10 +77,11 @@ class SignUp(TestCase):
                     "username": f"{rstr(letters(), 4)}",
                     "password": f"{rstr(nonwhitespace(), 7)}"
                     }
-        expected_result = {'username': ['Enter a valid email address.']}
+        expected_result = '{"username": ["Enter a valid email address.", "Ensure this value has at least 5 characters (it has 4)."]}'
         result = self.client.post(reverse('create_user'), payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 400)
+        self.maxDiff = None
+        self.assertEqual(result.content.decode(), expected_result)
 
     def test_sign_up_responds_error_if_username_is_already_picked(self):
         payload = {
@@ -91,13 +92,13 @@ class SignUp(TestCase):
         self.client.post(reverse('create_user'), payload, content_type="application/json")
         expected_result = {'username': ['User with this Username already exists.'],}
         result = self.client.post(reverse('create_user'), payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
         self.assertEqual(result.status_code, 400)
+        self.assertEqual(result.json(), expected_result)
 
     def test_create_user_endpoint_responds_access_token(self):
         payload = {"username": f"{rstr(letters(), 5, 50)}@{rstr(letters(), 4, 40)}.com",
                    "password": f"{rstr(nonwhitespace(), 7)}"}
         result = self.client.post(reverse("create_user"), payload, content_type="application/json")
-        token = jwt.decode(json.loads(result.content.decode())["access_token"],
+        token = jwt.decode(result["access_token"],
                            options={"verify_signature": False})
         self.assertEqual(token["usr"], payload["username"])

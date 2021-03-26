@@ -1,31 +1,26 @@
 import json
+import jwt
+
+from django.http import HttpResponse
+from django.core.signing import Signer
 
 from ..models import User
 
+class AuthenticationMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
 
-def auth_middleware(get_response):
-    # One-time configuration and initialization.
+    def __call__(self, request):
 
-    def middleware(request):
-        # Code to be executed for each request before
-        # the view (and later middleware) are called.
-        # Check in request if there is an access_token set.
-        try:
-            access_token = request.headers.get("access_token")
-            if access_token:
-                request.logged = True
-                response = get_response(request)
-        except AssertionError:
-            request.logged = False
-            response = get_response(request)
-        except KeyError:
-            request.logged = False
-            response = get_response(request)
+        if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
+            return self.get_response(request)
 
-        # Code to be executed for each request/response after
-        # the view is called.
-        # Nothing.
-
+        access_token = request.headers.get("access_token")
+        user_id = jwt.decode(access_token, Signer().sign("JWT"), algorithms=["HS256"]).get("sub")
+        user = User.objects.get(id=user_id)
+        if user:
+            response = self.get_response(request)
+        else:
+            response = HttpResponse()
+            response.status_code = 401
         return response
-
-    return middleware

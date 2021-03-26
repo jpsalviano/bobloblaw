@@ -29,9 +29,9 @@ class SignIn(TestCase):
 
     def test_sign_in_responds_error_if_wrong_password_is_entered(self):
         payload = {"username": self.username, "password": self.password + "-"}
-        expected_result = {"error": ["Wrong password."]}
+        expected_result = '{"error": ["Wrong password."]}'
         result = self.client.post(reverse("sign_in"), payload, content_type="application/json")
-        self.assertEqual(result.json(), expected_result)
+        self.assertEqual(result.content.decode(), expected_result)
         self.assertEqual(result.status_code, 401)
 
     def test_sign_in_responds_error_if_non_existent_username_is_entered(self):
@@ -45,6 +45,5 @@ class SignIn(TestCase):
         payload = {"username": self.username,
                    "password": self.password}
         result = self.client.post(reverse("sign_in"), payload, content_type="application/json")
-        token = jwt.decode(json.loads(result.content.decode())["access_token"],
-                           options={"verify_signature": False})
+        token = jwt.decode(result.__getitem__("access_token"), options={"verify_signature": False})
         self.assertEqual(token["usr"], payload["username"])

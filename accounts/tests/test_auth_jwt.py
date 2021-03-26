@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.core.signing import Signer
 
 from ..models import User
-from ..views.auth_jwt import _generate_token
+from ..auth_tools.auth_jwt import _generate_token
 
 
 class AuthJWT(TestCase):
