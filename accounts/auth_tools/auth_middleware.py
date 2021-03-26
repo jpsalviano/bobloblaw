@@ -19,13 +19,9 @@ class AuthenticationMiddleware:
             access_token = request.headers.get("access_token")
             user_id = jwt.decode(access_token, Signer().sign("JWT"), algorithms=["HS256"]).get("sub")
             user = User.objects.get(id=user_id)
-        except jwt.exceptions.DecodeError:
+            request.user = user
+            response = self.get_response(request)
+        except (jwt.exceptions.DecodeError, User.DoesNotExist):
             response = HttpResponse()
             response.status_code = 401
-        else:
-            if user:
-                response = self.get_response(request)
-            else:
-                response = HttpResponse()
-                response.status_code = 401
         return response
