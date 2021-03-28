@@ -19,7 +19,7 @@ class SignUp(TestCase):
                     "username": f"{rstr(letters(), 5, 50)}@{rstr(letters(), 4, 40)}.com",
                     "password": f"{rstr(nonwhitespace(), 7)}"
                     }
-        result = self.client.post(reverse('create_user'), payload, content_type="application/json")
+        result = self.client.post(reverse("create_user"), payload, content_type="application/json")
         user = User.objects.filter(username=payload["username"])
         self.assertTrue(user.exists())
         self.assertEqual(user.first().username, payload["username"])
@@ -30,7 +30,7 @@ class SignUp(TestCase):
                     "username": f"{rstr(letters(), 5, 50)}@{rstr(letters(), 4, 40)}.com",
                     "password": f"{rstr(letters(), 10, 20)}-"
                     }
-        self.client.post(reverse('create_user'), payload, content_type="application/json")
+        self.client.post(reverse("create_user"), payload, content_type="application/json")
         stored_password = User.objects.get(username=payload["username"]).password
         self.assertEqual(len(stored_password), 60)
 
