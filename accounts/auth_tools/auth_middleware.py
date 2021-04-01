@@ -12,10 +12,8 @@ class AuthenticationMiddleware:
 
     def __call__(self, request):
 
-        if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
-            return self.get_response(request)
-
-        # if get_response() is wrapped in a decorator; how can I check that?
+        # if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
+        #     return self.get_response(request)
 
         try:
             access_token = json.loads(request.body.decode()).get("access_token")
@@ -23,7 +21,10 @@ class AuthenticationMiddleware:
             user = User.objects.get(id=user_id)
             request.user = user.id
             response = self.get_response(request)
-        except (jwt.exceptions.DecodeError, jwt.exceptions.ExpiredSignatureError, json.decoder.JSONDecodeError, User.DoesNotExist):
+        except User.DoesNotExist:
+            request.user = None
+            response = self.get_response(request)            
+        except (jwt.exceptions.DecodeError, jwt.exceptions.ExpiredSignatureError, json.decoder.JSONDecodeError):
             response = HttpResponse()
             response.status_code = 401
         return response

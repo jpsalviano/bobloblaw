@@ -2,6 +2,8 @@ from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
+from ..auth_tools import auth_decorator
+
 
 class Private(View):
     def get(self, request):
