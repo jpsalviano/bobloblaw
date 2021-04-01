@@ -29,4 +29,4 @@ class AuthJWT(TestCase):
         self.assertTrue(payload_from_token)
         self.assertEqual(payload_from_token["usr"], self.user.username)
         self.assertEqual(payload_from_token["sub"], self.user.id)
-        self.assertTrue(isinstance(payload_from_token["exp"], float))
+        self.assertTrue(isinstance(payload_from_token["exp"], int))

@@ -55,5 +55,3 @@ class AuthMiddleware(TestCase):
                                                     content_type="application/json"
                                                     )
         self.assertEqual(post_private_request.status_code, 401)
-        
-    
