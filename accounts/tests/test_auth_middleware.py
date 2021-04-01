@@ -1,6 +1,8 @@
 from rstr import rstr, letters, nonwhitespace
 import jwt
 import json
+import datetime
+from freezegun import freeze_time
 
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -19,6 +21,15 @@ class AuthMiddleware(TestCase):
         self.user = User.objects.create(username=self.username, password=self.password)
         self.sign = Signer().sign("JWT")
 
+    def test_auth_middleware_responds_200_if_valid_token_set(self):
+        valid_signin_response = self.client.post(reverse("sign_in"), self.payload, content_type="application/json")
+        valid_access_token = valid_signin_response._headers.get("access_token")[1]
+        post_private_request = self.client.post(reverse("private"),
+                                              {"access_token" : valid_access_token},
+                                              content_type="application/json"
+                                            )
+        self.assertEqual(post_private_request.status_code, 200)
+
     def test_auth_middleware_responds_401_if_no_token_set(self):
         get_private_request = self.client.get(
                                               reverse("private"),
@@ -35,12 +46,14 @@ class AuthMiddleware(TestCase):
                                             )
         self.assertEqual(get_private_request.status_code, 401)
 
-    def test_auth_middleware_responds_200_if_valid_token_set(self):
+    def test_auth_middleware_responds_401_if_expired_token_set(self):
         valid_signin_response = self.client.post(reverse("sign_in"), self.payload, content_type="application/json")
         valid_access_token = valid_signin_response._headers.get("access_token")[1]
-        valid_access_token_payload = jwt.decode(valid_access_token, self.sign, algorithms=["HS256"])
-        post_private_request = self.client.post(reverse("private"),
-                                              {"access_token" : valid_access_token},
-                                              content_type="application/json"
-                                            )
-        self.assertEqual(post_private_request.status_code, 200)
+        with freeze_time(datetime.datetime.utcnow() + datetime.timedelta(seconds=84601)):
+            post_private_request = self.client.post(reverse("private"),
+                                                    {"access_token" : valid_access_token},
+                                                    content_type="application/json"
+                                                    )
+        self.assertEqual(post_private_request.status_code, 401)
+        
+    

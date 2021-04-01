@@ -21,7 +21,7 @@ class AuthenticationMiddleware:
             user = User.objects.get(id=user_id)
             request.user = user.id
             response = self.get_response(request)
-        except (jwt.exceptions.DecodeError, json.decoder.JSONDecodeError, User.DoesNotExist):
+        except (jwt.exceptions.DecodeError, jwt.exceptions.ExpiredSignatureError, json.decoder.JSONDecodeError, User.DoesNotExist):
             response = HttpResponse()
             response.status_code = 401
         return response

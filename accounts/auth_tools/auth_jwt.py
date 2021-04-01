@@ -1,5 +1,5 @@
 import jwt
-import time
+import datetime
 
 from django.core.signing import Signer
 
@@ -12,7 +12,7 @@ def _generate_token(username):
     payload = {
         "usr": username,
         "sub": user_id,
-        "exp": time.time() + 86400
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=84600)
     }
     token = jwt.encode(payload, secret_key, algorithm="HS256")
     return token
