@@ -22,7 +22,8 @@ class AuthMiddleware(TestCase):
         self.sign = Signer().sign("JWT")
 
     def test_auth_middleware_responds_200_if_valid_token_set(self):
-        valid_signin_response = self.client.post(reverse("sign_in"), self.payload, content_type="application/json")
+        valid_signin_response = self.client.post(reverse("sign_in"), self.payload,
+                                                 content_type="application/json")
         valid_access_token = valid_signin_response._headers.get("access_token")[1]
         post_private_request = self.client.post(reverse("private"),
                                               {"access_token" : valid_access_token},
@@ -39,15 +40,17 @@ class AuthMiddleware(TestCase):
         self.assertEqual(get_private_request.status_code, 401)
 
     def test_auth_middleware_responds_401_if_invalid_token_set(self):
+        invalid_token = jwt.encode(self.payload, Signer().sign(""), algorithm="HS256")
         get_private_request = self.client.get(
                                               reverse("private"),
-                                              {'access_token': 'invalid'},
+                                              {"access_token": invalid_token},
                                               content_type="application/json"
                                             )
         self.assertEqual(get_private_request.status_code, 401)
 
     def test_auth_middleware_responds_401_if_expired_token_set(self):
-        valid_signin_response = self.client.post(reverse("sign_in"), self.payload, content_type="application/json")
+        valid_signin_response = self.client.post(reverse("sign_in"), self.payload,
+                                                 content_type="application/json")
         valid_access_token = valid_signin_response._headers.get("access_token")[1]
         with freeze_time(datetime.datetime.utcnow() + datetime.timedelta(seconds=84601)):
             post_private_request = self.client.post(reverse("private"),

@@ -15,6 +15,8 @@ class AuthenticationMiddleware:
         if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
             return self.get_response(request)
 
+        # if get_response() is wrapped in a decorator; how can I check that?
+
         try:
             access_token = json.loads(request.body.decode()).get("access_token")
             user_id = jwt.decode(access_token, Signer().sign("JWT"), algorithms=["HS256"]).get("sub")
