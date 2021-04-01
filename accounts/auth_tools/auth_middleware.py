@@ -16,12 +16,12 @@ class AuthenticationMiddleware:
             return self.get_response(request)
 
         try:
-            access_token = request.headers.get("access_token")
+            access_token = json.loads(request.body.decode()).get("access_token")
             user_id = jwt.decode(access_token, Signer().sign("JWT"), algorithms=["HS256"]).get("sub")
             user = User.objects.get(id=user_id)
-            request.user = user
+            request.user = user.id
             response = self.get_response(request)
-        except (jwt.exceptions.DecodeError, User.DoesNotExist):
+        except (jwt.exceptions.DecodeError, json.decoder.JSONDecodeError, User.DoesNotExist):
             response = HttpResponse()
             response.status_code = 401
         return response
