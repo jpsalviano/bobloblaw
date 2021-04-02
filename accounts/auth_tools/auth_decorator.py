@@ -1,5 +1,5 @@
 
 
 def login_required(func, request):
-    if request.user !- None:
+    if request.user != None:
         return func
