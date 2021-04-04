@@ -1,6 +1,6 @@
 # BobLobLaw
 
-BobLobLaw is an application developed for learning purposes, that is, the main intention of the project is to learn web development techniques and best practices. The concrete goal is to build and serve a system that is simple, safe and stable, allowing user registration and login.
+BobLobLaw is an application developed for learning purposes, i.e. the main intention of the project is to learn web development techniques and best practices. The concrete goal is to build and serve a system that is simple, safe and stable, allowing user registration and login.
 In the back-end, I build upon Django framework an API that serves the front-end, an interface built with React.
 Python version: 3.8.5+
 
