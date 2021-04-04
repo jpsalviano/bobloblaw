@@ -17,12 +17,11 @@ class AuthDecorator(TestCase):
         self.user = User.objects.create(username=self.username, password=self.password)
         self.payload = {"username": self.username, "password": self.password}
 
-    def test_get_private_endpoint_responds_403_status_code(self):
+    def test_get_private_endpoint_responds_401_status_code_if_no_valid_token_set(self):
         get_request_private = self.client.get(reverse("private"), self.payload,
                                                content_type="application/json")
-        self.assertEqual(get_request_private.status_code, 403)
-        self.assertEqual(get_request_private.content.decode(),
-                         json.dumps({"error": ["Forbidden."]}))
+        self.assertEqual(get_request_private.status_code, 401)
+
 
     def test_get_private_endpoint_responds_200_status_code_if_valid_token_set(self):
         valid_signin_response = self.client.post(reverse("sign_in"), self.payload,

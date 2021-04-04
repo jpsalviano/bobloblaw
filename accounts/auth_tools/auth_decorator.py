@@ -1,5 +1,5 @@
 from functools import wraps
-from django.http import JsonResponse
+from django.http import HttpResponse
 
 
 def login_required(endpoint):
@@ -8,7 +8,7 @@ def login_required(endpoint):
         if request.user != None:
             return endpoint(self, request, *args, **kwargs)
         else:
-            response = JsonResponse({"error": ["Forbidden."]})
-            response.status_code = 403
+            response = HttpResponse()
+            response.status_code = 401
             return response
     return _wrapped_view

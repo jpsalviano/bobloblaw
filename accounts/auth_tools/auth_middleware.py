@@ -11,19 +11,12 @@ class AuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-
-        if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
-            return self.get_response(request)
-        # When user makes get requests to signin or signup, this midd should not respond with error
-
         try:
-            # if not public:
             access_token = json.loads(request.body.decode()).get("access_token")
             user_id = jwt.decode(access_token, Signer().sign("JWT"), algorithms=["HS256"]).get("sub")
             user = User.objects.get(id=user_id)
             request.user = user.id
             response = self.get_response(request)
-            # else responds with view (e.g. get signup or signin)
         except User.DoesNotExist:
             request.user = None
             response = self.get_response(request)
