@@ -11,6 +11,10 @@ from ..forms import SignInForm
 
 
 class SignIn(View):
+    def get(self, request):
+        response = JsonResponse({"get signin form": "ok"})
+        return response
+
     def post(self, request):
         try:
             form = SignInForm(json.loads(request.body.decode()))

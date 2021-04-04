@@ -11,10 +11,6 @@ class AuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-
-        # if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
-        #     return self.get_response(request)
-
         try:
             access_token = json.loads(request.body.decode()).get("access_token")
             user_id = jwt.decode(access_token, Signer().sign("JWT"), algorithms=["HS256"]).get("sub")
@@ -23,8 +19,14 @@ class AuthenticationMiddleware:
             response = self.get_response(request)
         except User.DoesNotExist:
             request.user = None
-            response = self.get_response(request)            
-        except (jwt.exceptions.DecodeError, jwt.exceptions.ExpiredSignatureError, json.decoder.JSONDecodeError):
-            response = HttpResponse()
-            response.status_code = 401
+            response = self.get_response(request)
+        except jwt.exceptions.DecodeError:
+            request.user = None
+            response = self.get_response(request)
+        except jwt.exceptions.ExpiredSignatureError:
+            request.user = None
+            response = self.get_response(request)
+        except json.decoder.JSONDecodeError:
+            request.user = None
+            response = self.get_response(request)
         return response
