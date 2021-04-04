@@ -12,8 +12,8 @@ class AuthenticationMiddleware:
 
     def __call__(self, request):
 
-        # if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
-        #     return self.get_response(request)
+        if request.path == "/accounts/signin/" or request.path == "/accounts/signup/":
+            return self.get_response(request)
         # When user makes get requests to signin or signup, this midd should not respond with error
 
         try:
@@ -26,8 +26,14 @@ class AuthenticationMiddleware:
             # else responds with view (e.g. get signup or signin)
         except User.DoesNotExist:
             request.user = None
-            response = self.get_response(request)            
-        except (jwt.exceptions.DecodeError, jwt.exceptions.ExpiredSignatureError, json.decoder.JSONDecodeError):
-            response = HttpResponse()
-            response.status_code = 401
+            response = self.get_response(request)
+        except jwt.exceptions.DecodeError:
+            request.user = None
+            response = self.get_response(request)
+        except jwt.exceptions.ExpiredSignatureError:
+            request.user = None
+            response = self.get_response(request)
+        except json.decoder.JSONDecodeError:
+            request.user = None
+            response = self.get_response(request)
         return response
